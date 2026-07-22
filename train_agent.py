@@ -17,7 +17,7 @@ model = PPO("MultiInputPolicy", gym_env, verbose=1)
 
 print("Starting training (this might take a minute)...")
 # 4. Train the agent. We will start with a small number of steps to test it.
-model.learn(total_timesteps=2000)
+model.learn(total_timesteps=50000)
 
 # 5. Save the trained weights to your Mac
 model.save("ppo_power_router")
