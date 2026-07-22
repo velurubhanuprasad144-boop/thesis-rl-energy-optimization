@@ -17,10 +17,10 @@ class CompositeRoutingReward(BaseReward):
         obs = env.get_obs()
         max_capacity_usage = np.max(obs.rho)
         
-        # Component 1: Survival Bonus (Guaranteed points for staying alive)
+        # Component 1: Survival Bonus
         survival_bonus = 1.0 
         
-        # Component 2: Optimization Bonus (Higher points for cooler lines)
+        # Component 2: Optimization Bonus
         optimization_bonus = 1.0 - max_capacity_usage
         
         # The AI must survive to collect the optimization points
@@ -28,19 +28,19 @@ class CompositeRoutingReward(BaseReward):
         
         return float(max(0.0, reward))
 
-# 2. Load the environment with the new Composite Reward
+# 2. Load the environment with the Composite Reward
 env = grid2op.make("l2rpn_case14_sandbox", reward_class=CompositeRoutingReward)
 gym_env = GymEnv(env)
 gym_env.action_space = BoxGymActSpace(env.action_space)
 
-print("Initializing PPO Agent with Composite Reward Function...")
-# 3. Create the brain (New TensorBoard folder for the composite run)
-model = PPO("MultiInputPolicy", gym_env, verbose=1, tensorboard_log="./ppo_composite_tensorboard/")
+print("Initializing PPO Agent for 500k Composite Run...")
+# 3. Create the brain (New TensorBoard folder for the 500k composite run)
+model = PPO("MultiInputPolicy", gym_env, verbose=1, tensorboard_log="./ppo_composite_500k_tensorboard/")
 
-print("Starting training (50,000 steps)...")
+print("Starting training (500,000 steps). This will take a while...")
 # 4. Train the agent
-model.learn(total_timesteps=50000)
+model.learn(total_timesteps=500000)
 
-# 5. Save the updated brain as Version 4
-model.save("ppo_power_router_v4_composite")
-print("Training complete! Version 4 of the AI brain successfully saved.")
+# 5. Save the updated brain as Version 5
+model.save("ppo_power_router_v5_composite_500k")
+print("Training complete! Version 5 of the AI brain successfully saved.")
