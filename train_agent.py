@@ -13,8 +13,8 @@ def linear_schedule(initial_value: float) -> Callable[[float], float]:
         return progress_remaining * initial_value
     return func
 
-# 2. Define the Survival-Weighted Composite Reward
-class SurvivalWeightedReward(BaseReward):
+# 2. Define the Perfectly Normalized Reward
+class NormalizedReward(BaseReward):
     def initialize(self, env):
         pass
         
@@ -25,43 +25,44 @@ class SurvivalWeightedReward(BaseReward):
         obs = env.get_obs()
         max_capacity_usage = np.max(obs.rho)
         
-        # Massive 10-point incentive strictly for surviving
-        survival_bonus = 10.0 
+        # Strict normalization: The maximum possible reward per step is exactly 1.0
+        survival_weight = 0.5
+        optimization_weight = 0.5
         
-        # Minor 1-point incentive for keeping lines cool
-        optimization_bonus = 1.0 - max_capacity_usage
+        survival_score = 1.0 * survival_weight
+        optimization_score = max(0.0, 1.0 - max_capacity_usage) * optimization_weight
         
-        reward = survival_bonus + optimization_bonus
-        return float(max(0.0, reward))
+        reward = survival_score + optimization_score
+        return float(reward)
 
 # 3. Load the primary Training Environment
-env = grid2op.make("l2rpn_case14_sandbox", reward_class=SurvivalWeightedReward)
+env = grid2op.make("l2rpn_case14_sandbox", reward_class=NormalizedReward)
 gym_env = GymEnv(env)
 gym_env.action_space = BoxGymActSpace(env.action_space)
 
 # 4. Load the parallel Evaluation Environment for the Callback
-eval_env_raw = grid2op.make("l2rpn_case14_sandbox", reward_class=SurvivalWeightedReward)
+eval_env_raw = grid2op.make("l2rpn_case14_sandbox", reward_class=NormalizedReward)
 eval_env = GymEnv(eval_env_raw)
 eval_env.action_space = BoxGymActSpace(eval_env_raw.action_space)
 
 # 5. Configure the Evaluation Callback
 eval_callback = EvalCallback(eval_env, 
-                             best_model_save_path='./logs/best_model_v8/',
-                             log_path='./logs/results_v8/',
+                             best_model_save_path='./logs/best_model_v9/',
+                             log_path='./logs/results_v9/',
                              eval_freq=10000, 
                              deterministic=True, 
                              render=False)
 
-print("Initializing PPO Agent with Survival-Weighted Reward...")
+print("Initializing PPO Agent with Normalized Reward (Max 1.0)...")
 # 6. Create the brain with the scheduler
 model = PPO("MultiInputPolicy", gym_env, verbose=1, 
             learning_rate=linear_schedule(0.0003),
-            tensorboard_log="./ppo_survival_weighted_tensorboard/")
+            tensorboard_log="./ppo_normalized_tensorboard/")
 
-print("Starting training (500,000 steps). The safest model will be saved automatically...")
+print("Starting training (500,000 steps). The peak normalized model will be saved automatically...")
 # 7. Train the agent
 model.learn(total_timesteps=500000, callback=eval_callback)
 
-# 8. Save the final end-state brain as Version 8
-model.save("ppo_power_router_v8_survival_weighted")
-print("Training complete! Check the './logs/best_model_v8/' folder for your peak performing agent.")
+# 8. Save the final end-state brain as Version 9
+model.save("ppo_power_router_v9_normalized")
+print("Training complete! Check the './logs/best_model_v9/' folder for your peak performing agent.")
