@@ -11,7 +11,7 @@ gym_env.action_space = BoxGymActSpace(env.action_space)
 
 # 2. Load your newly trained AI brain
 print("Loading the trained PPO agent...")
-model = PPO.load("ppo_power_router")
+model = PPO.load("./logs/best_model_v9/best_model")
 
 # 3. Reset the grid for a fresh run
 obs = gym_env.reset()
