@@ -20,5 +20,5 @@ print("Starting training (this might take a minute)...")
 model.learn(total_timesteps=50000)
 
 # 5. Save the trained weights to your Mac
-model.save("ppo_power_router")
+model.save("model_v1")
 print("Training complete! AI brain successfully saved.")

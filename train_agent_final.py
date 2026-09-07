@@ -46,12 +46,15 @@ eval_env = GymEnv(eval_env_raw)
 eval_env.action_space = BoxGymActSpace(eval_env_raw.action_space)
 
 # 5. Configure the Evaluation Callback
-eval_callback = EvalCallback(eval_env, 
-                             best_model_save_path='./logs/best_model_v9/',
-                             log_path='./logs/results_v9/',
-                             eval_freq=10000, 
-                             deterministic=True, 
-                             render=False)
+eval_callback = EvalCallback(
+    eval_env,
+    best_model_save_path='./models/model_final_best/', # Update this path
+    log_path='./logs/',
+    eval_freq=1000,
+    deterministic=True,
+    render=False
+)
+
 
 print("Initializing PPO Agent with Normalized Reward (Max 1.0)...")
 # 6. Create the brain with the scheduler
@@ -64,5 +67,5 @@ print("Starting training (500,000 steps). The peak normalized model will be save
 model.learn(total_timesteps=500000, callback=eval_callback)
 
 # 8. Save the final end-state brain as Version 9
-model.save("ppo_power_router_v9_normalized")
-print("Training complete! Check the './logs/best_model_v9/' folder for your peak performing agent.")
+model.save("model_final")
+print("Training complete! Check the './models/model_final_best/' folder for your peak performing agent.")

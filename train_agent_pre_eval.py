@@ -52,5 +52,5 @@ print("Starting training (500,000 steps). This will take a while...")
 model.learn(total_timesteps=500000)
 
 # 6. Save the updated brain as Version 6
-model.save("ppo_power_router_v6_tuned")
-print("Training complete! Version 6 of the AI brain successfully saved.")
+model.save("model_pre_eval")
+print("Training complete! pre evaluation callback  model of the AI brain successfully saved.")
