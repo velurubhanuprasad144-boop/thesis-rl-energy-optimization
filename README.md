@@ -5,7 +5,28 @@ This repository contains the official codebase, environments, and trained artifi
 ## 📌 Project Abstract
 As modern power grids integrate higher volumes of volatile renewable energy, traditional mathematical heuristic solvers struggle with the computational bottlenecks required for real-time dispatching. This project frames electrical grid topology management as a Markov Decision Process (MDP). By training a PPO agent within the Grid2Op framework, the AI learns to actively manipulate busbars and route power dynamically, balancing strict physical grid constraints with maximum operational efficiency.
 
+*   **`data_grid2op/`**
+    The directory containing the local `l2rpn_case14_sandbox` dataset and grid chronics required for the Grid2Op simulation environment.
+*   **`baseline.py`**
+    Evaluates the standard, unmanaged grid simulation ("Do-Nothing" approach) to establish a baseline survival metric (807 timesteps) prior to any AI intervention.
+*   **`evaluate_agent.py`**
+    A dynamic testing script utilizing `argparse` to load and evaluate specific PPO model weights (`.zip`) against a fixed environmental seed (Seed: 42) for reproducible benchmarking.
+*   **`model_final.zip`**
+    The serialized PyTorch neural network weights for the finalized, highest-performing V9 agent, captured at its peak using an evaluation callback.
+*   **`model_pre_eval.zip`**
+    The weights for the intermediate agent trained with custom composite rewards. This model serves as the primary example of catastrophic forgetting during extended training.
+*   **`model_v1.zip`**
+    The weights for the initial AI agent trained exclusively on unconstrained survival time without thermal capacity penalties.
+*   **`test_env.py`**
+    A lightweight diagnostic script used to verify the Grid2Op installation and ensure the physical environment loads the dataset correctly.
+*   **`train_agent_final.py`**
+    The production training script implementing strict reward normalization ($[0.0, 1.0]$) and an `EvalCallback` routine to prevent policy collapse and capture peak performance.
+*   **`train_agent_pre_eval.py`**
+    The intermediate training pipeline featuring composite reward shaping, utilized to demonstrate the vulnerability of continuous agents to late-stage performance degradation.
+*   **`train_agent_v1.py`**
+    The foundational training pipeline that established the initial Box/Dict action space wrappers and baseline PPO architecture using default rewards.
 
+    
 ## ⚙️ Environment and Agent Architecture
 * **Simulation Environment:** [Grid2Op](https://grid2op.readthedocs.io/) running the `l2rpn_case14_sandbox` (based on the IEEE 14-bus system).
 * **Action Space:** A combinatorial discrete-continuous hybrid, mapped via `BoxGymActSpace` to allow the PPO agent to handle complex topological permutations (node splitting, line reconnections).
